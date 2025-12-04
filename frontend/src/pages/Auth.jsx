@@ -93,7 +93,7 @@ export default function Auth({ onLogin }) {
         <input
           type="text"
           placeholder="Username"
-          className="w-full p-3 mb-3 rounded bg-slate-700 text-white"
+          className="w-full p-3 mb-3 rounded bg-slate-700 text-red-500"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -103,7 +103,7 @@ export default function Auth({ onLogin }) {
           <input
             type="email"
             placeholder="Email"
-            className="w-full p-3 mb-3 rounded bg-slate-700 text-white"
+            className="w-full p-3 mb-3 rounded bg-black text-red"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -113,7 +113,7 @@ export default function Auth({ onLogin }) {
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-3 mb-3 rounded bg-slate-700 text-white"
+          className="w-full p-3 mb-3 rounded bg-slate-700 text-red"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -121,7 +121,7 @@ export default function Auth({ onLogin }) {
         {/* Role only in signup */}
         {mode === "signup" && (
           <select
-            className="w-full p-3 mb-4 rounded bg-slate-700 text-white"
+            className="w-full p-3 mb-4 rounded bg-slate-700 text-red-500"
             value={role}
             onChange={(e) => setRole(e.target.value)}
           >

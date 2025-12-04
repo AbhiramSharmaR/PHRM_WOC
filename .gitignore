@@ -1,0 +1,83 @@
+# ------------ PYTHON ------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.db
+*.sqlite3
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+*.dylib
+
+# ------------ FASTAPI / UVICORN ------------
+*.log
+*.pid
+
+# ------------ MONGO / DB CACHE ------------
+# if you ever create local dump files
+dump/
+*.bson
+*.wt
+
+# ------------ ENV / SECRETS ------------
+.env
+*.env
+
+# ------------ OS / EDITOR FILES ------------
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# ------------ PYTHON PACKAGES ------------
+# Do not upload installed packages
+site-packages/
+pip-wheel-metadata/
+
+# ------------ TEST / CACHE ------------
+pytest_cache/
+.cache/
+coverage/
+
+# ------------ BUILD / DIST ------------
+build/
+dist/
+*.egg-info/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+
+# Django
+*.log
+staticfiles/
+media/
+*.sqlite3
+
+# Node / React
+node_modules/
+dist/
+build/
+
+# Environment Secrets
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db

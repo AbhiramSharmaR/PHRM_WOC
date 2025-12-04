@@ -45,10 +45,10 @@ export default function Login({ switchToSignup, onLogin }) {
 
         {error && <p className="text-red-400 text-center mb-2">{error}</p>}
 
-        <input className="input" placeholder="Username"
+        <input className="w-full p-3 mb-3 rounded bg-slate-700 text-white" placeholder="Username"
           onChange={(e) => setUsername(e.target.value)} />
 
-        <input className="input" type="password" placeholder="Password"
+        <input className="w-full p-3 mb-3 rounded bg-slate-700 text-white" type="password" placeholder="Password"
           onChange={(e) => setPassword(e.target.value)} />
 
         <button

@@ -45,20 +45,20 @@ export default function Signup({ switchToLogin }) {
         {error && <p className="text-red-400 text-center mb-2">{error}</p>}
         {success && <p className="text-green-400 text-center mb-2">{success}</p>}
 
-        <input className="input" placeholder="Username"
+        <input className="w-full p-3 mb-3 rounded bg-slate-700 text-white" placeholder="Username"
           onChange={(e) => setUsername(e.target.value)} />
 
-        <input className="input" placeholder="Email"
+        <input className="w-full p-3 mb-3 rounded bg-slate-700 text-white" placeholder="Email"
           onChange={(e) => setEmail(e.target.value)} />
 
-        <input className="input" type="password" placeholder="Password"
+        <input className="w-full p-3 mb-3 rounded bg-slate-700 text-white" type="password" placeholder="Password"
           onChange={(e) => setPassword(e.target.value)} />
 
-        <select className="input" onChange={(e) => setRole(e.target.value)}>
+        <select className="w-full p-3 mb-3 rounded bg-slate-700 text-white" onChange={(e) => setRole(e.target.value)}>
           <option value="patient">Patient</option>
           <option value="family">Family</option>
           <option value="doctor">Doctor</option>
-          <option value="researcher">Researcher</option>
+        
         </select>
 
         <button onClick={signup} className="w-full mt-4 py-2 bg-blue-600 rounded-lg">

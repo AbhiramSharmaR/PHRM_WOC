@@ -14,15 +14,20 @@ const commonSymptoms = [
   'Insomnia', 'Anxiety', 'Stomach Pain', 'Vomiting', 'Diarrhea',
 ];
 
+// -----------------------------
+// Backend Response Types
+// -----------------------------
+type ApiResponse = {
+  conditions: { name: string; confidence: number }[];
+  risk_level: 'Low' | 'Medium' | 'High';
+  advice: string;
+};
+
 const SymptomChecker = () => {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [results, setResults] = useState<null | {
-    conditions: { name: string; probability: number }[];
-    severity: 'low' | 'medium' | 'high';
-    recommendations: string[];
-  }>(null);
+  const [results, setResults] = useState<ApiResponse | null>(null);
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
@@ -32,38 +37,55 @@ const SymptomChecker = () => {
     );
   };
 
+  // -----------------------------
+  // API CALL
+  // -----------------------------
   const handleAnalyze = async () => {
     if (selectedSymptoms.length === 0) return;
-    
+
     setIsAnalyzing(true);
-    
-    // Simulate AI analysis
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    setResults({
-      conditions: [
-        { name: 'Common Cold', probability: 75 },
-        { name: 'Seasonal Allergies', probability: 45 },
-        { name: 'Viral Infection', probability: 30 },
-      ],
-      severity: 'low',
-      recommendations: [
-        'Rest and stay hydrated',
-        'Consider over-the-counter cold medicine',
-        'Monitor symptoms for 48-72 hours',
-        'Consult a doctor if symptoms worsen',
-      ],
-    });
-    
-    setIsAnalyzing(false);
+    setResults(null);
+
+    try {
+      // Normalize symptoms to backend format
+      const normalizedSymptoms = selectedSymptoms.map((s) =>
+        s.toLowerCase().trim()
+      );
+
+      const response = await fetch('http://localhost:8000/symptom-check/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          symptoms: normalizedSymptoms,
+          description: additionalInfo,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze symptoms');
+      }
+
+      const data: ApiResponse = await response.json();
+      setResults(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'low': return 'bg-success/10 text-success border-success/30';
-      case 'medium': return 'bg-warning/10 text-warning border-warning/30';
-      case 'high': return 'bg-destructive/10 text-destructive border-destructive/30';
-      default: return 'bg-muted text-muted-foreground';
+    switch (severity.toLowerCase()) {
+      case 'low':
+        return 'bg-success/10 text-success border-success/30';
+      case 'medium':
+        return 'bg-warning/10 text-warning border-warning/30';
+      case 'high':
+        return 'bg-destructive/10 text-destructive border-destructive/30';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -79,7 +101,9 @@ const SymptomChecker = () => {
             <Brain className="w-8 h-8 text-primary" />
             AI Symptom Checker
           </h1>
-          <p className="text-muted-foreground">Select your symptoms and get AI-powered health insights</p>
+          <p className="text-muted-foreground">
+            Select your symptoms and get AI-powered health insights
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
@@ -87,7 +111,9 @@ const SymptomChecker = () => {
           <Card>
             <CardHeader>
               <CardTitle>Select Your Symptoms</CardTitle>
-              <CardDescription>Choose all symptoms you're experiencing</CardDescription>
+              <CardDescription>
+                Choose all symptoms you're experiencing
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2">
@@ -108,7 +134,9 @@ const SymptomChecker = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Additional Information</label>
+                <label className="text-sm font-medium">
+                  Additional Information
+                </label>
                 <Textarea
                   placeholder="Describe any other symptoms or relevant information..."
                   value={additionalInfo}
@@ -146,15 +174,21 @@ const SymptomChecker = () => {
           <Card>
             <CardHeader>
               <CardTitle>Analysis Results</CardTitle>
-              <CardDescription>AI-powered health assessment</CardDescription>
+              <CardDescription>
+                AI-powered health assessment
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {!results && !isAnalyzing && (
                 <div className="h-64 flex items-center justify-center text-center">
                   <div>
                     <Brain className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground">Select symptoms and click analyze</p>
-                    <p className="text-sm text-muted-foreground/70">to get AI-powered insights</p>
+                    <p className="text-muted-foreground">
+                      Select symptoms and click analyze
+                    </p>
+                    <p className="text-sm text-muted-foreground/70">
+                      to get AI-powered insights
+                    </p>
                   </div>
                 </div>
               )}
@@ -166,63 +200,74 @@ const SymptomChecker = () => {
                       <Loader2 className="w-8 h-8 text-primary animate-spin" />
                     </div>
                     <p className="font-medium">Analyzing symptoms...</p>
-                    <p className="text-sm text-muted-foreground">Our AI is processing your inputs</p>
+                    <p className="text-sm text-muted-foreground">
+                      Our AI is processing your inputs
+                    </p>
                   </div>
                 </div>
               )}
 
               {results && !isAnalyzing && (
                 <div className="space-y-6">
-                  {/* Severity Badge */}
-                  <div className={cn('p-4 rounded-lg border', getSeverityColor(results.severity))}>
+                  {/* Severity */}
+                  <div
+                    className={cn(
+                      'p-4 rounded-lg border',
+                      getSeverityColor(results.risk_level)
+                    )}
+                  >
                     <div className="flex items-center gap-2">
-                      {results.severity === 'low' ? (
+                      {results.risk_level === 'Low' ? (
                         <CheckCircle className="w-5 h-5" />
                       ) : (
                         <AlertCircle className="w-5 h-5" />
                       )}
-                      <span className="font-medium capitalize">{results.severity} Severity</span>
+                      <span className="font-medium capitalize">
+                        {results.risk_level} Risk
+                      </span>
                     </div>
                   </div>
 
-                  {/* Possible Conditions */}
+                  {/* Conditions */}
                   <div>
-                    <p className="text-sm font-medium mb-3">Possible Conditions</p>
+                    <p className="text-sm font-medium mb-3">
+                      Possible Conditions
+                    </p>
                     <div className="space-y-2">
-                      {results.conditions.map((condition, idx) => (
-                        <div key={idx} className="flex items-center gap-3">
-                          <div className="flex-1">
-                            <div className="flex justify-between text-sm mb-1">
-                              <span>{condition.name}</span>
-                              <span className="text-muted-foreground">{condition.probability}%</span>
-                            </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-primary rounded-full transition-all duration-500"
-                                style={{ width: `${condition.probability}%` }}
-                              />
-                            </div>
+                      {results.conditions.map((condition) => (
+                        <div key={condition.name}>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>{condition.name}</span>
+                            <span className="text-muted-foreground">
+                              {(condition.confidence * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary rounded-full transition-all duration-500"
+                              style={{
+                                width: `${condition.confidence * 100}%`,
+                              }}
+                            />
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Recommendations */}
+                  {/* Advice */}
                   <div>
-                    <p className="text-sm font-medium mb-3">Recommendations</p>
-                    <ul className="space-y-2">
-                      {results.recommendations.map((rec, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-success mt-0.5 shrink-0" />
-                          {rec}
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-sm font-medium mb-3">
+                      Recommendation
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {results.advice}
+                    </p>
                   </div>
 
                   <p className="text-xs text-muted-foreground border-t border-border pt-4">
-                    ⚠️ This is not a medical diagnosis. Please consult a healthcare professional for proper medical advice.
+                    ⚠️ This is not a medical diagnosis. Please consult a
+                    healthcare professional for proper medical advice.
                   </p>
                 </div>
               )}

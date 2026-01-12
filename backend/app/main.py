@@ -9,6 +9,7 @@ from app.api.doctors import router as doctor_router
 from app.api.family import router as family_router
 from app.api.prescriptions import router as prescriptions_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.symptoms import router as symptoms_router
 #from app.api.ai import router as ai_router
 #from app.ai.symptoms import router as symptoms_router
 
@@ -62,7 +63,7 @@ app.include_router(doctor_router)
 app.include_router(family_router)
 app.include_router(prescriptions_router)
 #app.include_router(ai_router)
-#app.include_router(symptoms_router)
+app.include_router(symptoms_router)
 
 app.include_router(patients_router, prefix="/patients", tags=["Patients"])
 

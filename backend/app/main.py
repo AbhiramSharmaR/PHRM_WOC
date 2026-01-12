@@ -8,8 +8,17 @@ from fastapi.openapi.utils import get_openapi
 from app.api.doctors import router as doctor_router
 from app.api.family import router as family_router
 from app.api.prescriptions import router as prescriptions_router
+from fastapi.middleware.cors import CORSMiddleware
+#from app.api.ai import router as ai_router
+#from app.ai.symptoms import router as symptoms_router
+
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:8080",
+    "http://localhost:5173",
+]
 
 @app.on_event("startup")
 async def startup():
@@ -52,3 +61,20 @@ app.include_router(patients_router)
 app.include_router(doctor_router)
 app.include_router(family_router)
 app.include_router(prescriptions_router)
+#app.include_router(ai_router)
+#app.include_router(symptoms_router)
+
+app.include_router(patients_router, prefix="/patients", tags=["Patients"])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

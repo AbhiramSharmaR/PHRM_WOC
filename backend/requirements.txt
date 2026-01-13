@@ -4,13 +4,13 @@ pymongo
 motor
 python-dotenv
 python-jose[cryptography]
-passlib[bcrypt]
+passlib[bcrypt]==1.7.4
 pydantic
 pydantic-settings
 email-validator
 aiohttp
 requests
 python-multipart
-bcrypt
+bcrypt==3.2.2
 apscheduler
 pytz

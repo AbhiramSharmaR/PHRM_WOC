@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from jose import jwt, JWTError
+from jose import jwt
 
 from app.db.mongodb import get_db
 from app.core.deps import get_current_user
@@ -41,53 +41,41 @@ async def register_user(
     payload: RegisterUser,
     db=Depends(get_db),
 ):
-    try:
-        print("STEP 1: entered register route")
-
-        print("STEP 2: payload =", payload)
-
-        existing = await db.users.find_one({"email": payload.email})
-        print("STEP 3: existing user check passed")
-
-        if existing:
-            raise HTTPException(status_code=400, detail="User already exists")
-
-        hashed_pw = pwd_context.hash(payload.password)
-        print("STEP 4: password hashed")
-
-        new_user = {
-            "email": payload.email,
-            "full_name": payload.full_name,
-            "password": hashed_pw,
-            "role": payload.role,
-        }
-
-        result = await db.users.insert_one(new_user)
-        print("STEP 5: user inserted")
-
-        user_id = str(result.inserted_id)
-
-        print("STEP 6: SECRET_KEY =", repr(settings.SECRET_KEY))
-
-        token_data = {
-            "sub": user_id,
-            "email": payload.email,
-            "exp": datetime.utcnow() + timedelta(hours=24),
-        }
-
-        access_token = jwt.encode(
-            token_data,
-            settings.SECRET_KEY,
-            algorithm="HS256",
+    if len(payload.password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be 72 characters or fewer",
         )
 
-        print("STEP 7: JWT created")
+    existing = await db.users.find_one({"email": payload.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="User already exists")
 
-        return {"access_token": access_token, "token_type": "bearer"}
+    hashed_pw = pwd_context.hash(payload.password)
 
-    except Exception as e:
-        print("🔥 REGISTER ERROR:", repr(e))
-        raise
+    new_user = {
+        "email": payload.email,
+        "full_name": payload.full_name,
+        "password": hashed_pw,
+        "role": payload.role,
+    }
+
+    result = await db.users.insert_one(new_user)
+    user_id = str(result.inserted_id)
+
+    token_data = {
+        "sub": user_id,
+        "email": payload.email,
+        "exp": datetime.utcnow() + timedelta(hours=24),
+    }
+
+    access_token = jwt.encode(
+        token_data,
+        settings.SECRET_KEY,
+        algorithm="HS256",
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 # ----------- LOGIN -----------
@@ -97,6 +85,12 @@ async def login_user(
     payload: LoginUser,
     db=Depends(get_db),
 ):
+    if len(payload.password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be 72 characters or fewer",
+        )
+
     user = await db.users.find_one({"email": payload.email})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -119,11 +113,8 @@ async def login_user(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-# ----------- GET CURRENT USER (auth/me) -----------
+# ----------- GET CURRENT USER -----------
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_route(current_user: dict = Depends(get_current_user)):
-    """
-    Returns currently authenticated user's data.
-    """
     return current_user

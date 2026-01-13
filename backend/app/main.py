@@ -11,7 +11,6 @@ from app.api.prescriptions import router as prescriptions_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.symptoms import router as symptoms_router
 #from app.api.ai import router as ai_router
-#from app.ai.symptoms import router as symptoms_router
 
 
 app = FastAPI()

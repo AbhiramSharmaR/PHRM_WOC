@@ -5,7 +5,7 @@ from typing import List
 from app.ai.symptoms import analyze_symptoms
 
 router = APIRouter(
-    prefix="/symptom-check",
+    prefix="/symptomchecker",
     tags=["Symptom Checker"]
 )
 

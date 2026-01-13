@@ -68,14 +68,8 @@ app.include_router(patients_router, prefix="/patients", tags=["Patients"])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://phrm-frontend.onrender.com",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],   # <-- IMPORTANT
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

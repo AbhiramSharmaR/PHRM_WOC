@@ -4,7 +4,7 @@ import { toast } from '@/hooks/use-toast';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "https://phrm-backend.onrender.com",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

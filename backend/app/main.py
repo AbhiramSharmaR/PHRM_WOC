@@ -18,6 +18,7 @@ app = FastAPI()
 origins = [
     "http://localhost:8080",
     "http://localhost:5173",
+    "https://phrm-frontend.onrender.com",
 ]
 
 @app.on_event("startup")
@@ -68,7 +69,9 @@ app.include_router(patients_router, prefix="/patients", tags=["Patients"])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # <-- IMPORTANT
+    allow_origins=[
+    "https://phrm-frontend.onrender.com",
+    ],   
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],

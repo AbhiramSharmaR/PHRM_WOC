@@ -52,7 +52,7 @@ const SymptomChecker = () => {
         s.toLowerCase().trim()
       );
 
-      const response = await fetch('http://localhost:8000/symptomchecker/', {
+      const response = await fetch('https://phrm-backend.onrender.com/symptomchecker/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

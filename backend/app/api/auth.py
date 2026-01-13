@@ -41,35 +41,53 @@ async def register_user(
     payload: RegisterUser,
     db=Depends(get_db),
 ):
-    existing = await db.users.find_one({"email": payload.email})
-    if existing:
-        raise HTTPException(status_code=400, detail="User already exists")
+    try:
+        print("STEP 1: entered register route")
 
-    hashed_pw = pwd_context.hash(payload.password)
+        print("STEP 2: payload =", payload)
 
-    new_user = {
-        "email": payload.email,
-        "full_name": payload.full_name,
-        "password": hashed_pw,
-        "role": payload.role.lower(),  # normalize
-    }
+        existing = await db.users.find_one({"email": payload.email})
+        print("STEP 3: existing user check passed")
 
-    result = await db.users.insert_one(new_user)
-    user_id = str(result.inserted_id)
+        if existing:
+            raise HTTPException(status_code=400, detail="User already exists")
 
-    token_data = {
-        "sub": user_id,
-        "email": new_user["email"],
-        "exp": datetime.utcnow() + timedelta(hours=24),
-    }
+        hashed_pw = pwd_context.hash(payload.password)
+        print("STEP 4: password hashed")
 
-    access_token = jwt.encode(
-        token_data,
-        settings.SECRET_KEY,
-        algorithm="HS256",
-    )
+        new_user = {
+            "email": payload.email,
+            "full_name": payload.full_name,
+            "password": hashed_pw,
+            "role": payload.role,
+        }
 
-    return {"access_token": access_token, "token_type": "bearer"}
+        result = await db.users.insert_one(new_user)
+        print("STEP 5: user inserted")
+
+        user_id = str(result.inserted_id)
+
+        print("STEP 6: SECRET_KEY =", repr(settings.SECRET_KEY))
+
+        token_data = {
+            "sub": user_id,
+            "email": payload.email,
+            "exp": datetime.utcnow() + timedelta(hours=24),
+        }
+
+        access_token = jwt.encode(
+            token_data,
+            settings.SECRET_KEY,
+            algorithm="HS256",
+        )
+
+        print("STEP 7: JWT created")
+
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    except Exception as e:
+        print("🔥 REGISTER ERROR:", repr(e))
+        raise
 
 
 # ----------- LOGIN -----------
